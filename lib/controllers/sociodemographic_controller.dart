@@ -8,7 +8,7 @@ import '../views/medicalhistory_sceen.dart';
 class DemographicController extends GetxController {
   String name = '';
   String gender = 'Male';
-  String age = '18-20 years';
+  String age = '18-25 years';
   String residence = 'Rural';
   String education = 'Matriculation (grade 9 and 10)';
   String profession = '';
@@ -24,6 +24,25 @@ class DemographicController extends GetxController {
       email}) async {
     debugPrint('submitForm() called');
     try {
+      ///storing page info if page has been used of user in firestore
+
+      // FirebaseFirestore.instance
+      //     .collection('users')
+      //     .doc(currentUser!.uid)
+      //     .update(
+      //   {
+      //     'pages': [
+      //       'socio_demographic',
+      //     ]
+      //   },
+      // );
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(currentUser!.uid)
+          .set({
+        'pages': FieldValue.arrayUnion(['socio_demographic']),
+      }, SetOptions(merge: true));
+      ////storing data of user in firestore
       await FirebaseFirestore.instance
           .collection('users')
           .doc(currentUser!.uid)

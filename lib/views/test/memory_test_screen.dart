@@ -166,7 +166,7 @@ class MemoryTestScreenState extends State<MemoryTestScreen> {
                         }
                       }
                       if (_controller.currentTrial.value == 2) {
-                        _controller.saveData(wordList, recognizedWordsList);
+                        // _controller.saveData(wordList, recognizedWordsList);
                         Future.delayed(const Duration(seconds: 3), () {
                           alertdialog();
                         });
@@ -179,6 +179,7 @@ class MemoryTestScreenState extends State<MemoryTestScreen> {
                           speakWordList();
                         });
                       }
+                      // _controller.saveData(wordList, recognizedWordsList);
                     } else {
                       _controller.recognizedText.value = result.recognizedWords;
                     }
@@ -283,7 +284,7 @@ class MemoryTestScreenState extends State<MemoryTestScreen> {
             Obx(
               () => Text(
                 _controller.starttest.value
-                    ? "Double top the button to start test"
+                    ? "Double tap the button to start test"
                     : _controller.isListening.value
                         ? _controller.recognizedText.value
                         : _controller.spokenSentence.value,

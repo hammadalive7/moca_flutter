@@ -4,8 +4,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:moca/controllers/firebase_const.dart';
 
 class SentenceController extends GetxController {
-  final CollectionReference _scoresCollection =
-      FirebaseFirestore.instance.collection('users');
+  // final CollectionReference _scoresCollection =
+  //     FirebaseFirestore.instance.collection('users');
 
   RxInt Score = 0.obs;
   RxBool isMicEnabled = false.obs;
@@ -30,13 +30,21 @@ class SentenceController extends GetxController {
 
   void incrementScore() {
     Score.value++;
-    _updateScore(Score.value);
   }
 
-  Future<void> _updateScore(int score) async {
+  Future<void> updateScore(int Score) async {
     try {
-      await _scoresCollection.doc(currentUser!.uid).update({
-        "language_test_1": {'sentence_rep_test_sccore': score}
+      // await _scoresCollection.doc(currentUser!.uid).update({
+      //   "language_test_1": {'sentence_rep_test_sccore': score}
+      // });
+
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(currentUser!.uid)
+          .update({
+        'language_test_1': {
+          'score': Score,
+        }
       });
     } catch (e) {
       debugPrint('Error updating score: $e');

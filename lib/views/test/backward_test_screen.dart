@@ -8,7 +8,11 @@ import 'package:flutter_tts/flutter_tts.dart';
 import 'vigilance_test_screen.dart';
 
 class BackwardDigitSpan extends StatefulWidget {
-  const BackwardDigitSpan({Key? key}) : super(key: key);
+  int? ForwardScore;
+  BackwardDigitSpan({
+    Key? key,
+    this.ForwardScore,
+  }) : super(key: key);
 
   @override
   State<BackwardDigitSpan> createState() => _BackDigitState();
@@ -20,7 +24,7 @@ class _BackDigitState extends State<BackwardDigitSpan> {
   FlutterTts flutterTts = FlutterTts();
   final DigitSpanController _controller = Get.put(DigitSpanController());
   int score = 0;
-  var numbers = ['8', '7', '5', '3', '1'];
+  var numbers = ['7', '4', '2'];
 
   bool isTimerStarted = false;
   bool innNextScreen = false;
@@ -30,9 +34,11 @@ class _BackDigitState extends State<BackwardDigitSpan> {
     super.initState();
     initalizeSharedPref();
   }
+
   void initalizeSharedPref() async {
     sf = await SharedPreferences.getInstance();
   }
+
   void _startTest() {
     isTimerStarted = true;
     _controller.timeDuration();
@@ -67,7 +73,11 @@ class _BackDigitState extends State<BackwardDigitSpan> {
     _controller.isReading.value = false;
   }
 
-  void nextTest() {
+  Future<void> nextTest() async {
+    int score = _controller.getScore();
+    score = score + widget.ForwardScore!;
+
+    await _controller.updateScore(score);
     sf.setInt('nextGame', 8);
     innNextScreen = true;
     _controller.remainingSeconds.value = 0;
@@ -101,8 +111,8 @@ class _BackDigitState extends State<BackwardDigitSpan> {
                     _controller.text.value = result.recognizedWords;
                     var recognizedWords =
                         _controller.text.replaceAll('', ' ').split(' ');
-                    var numbersJoined = numbers.join('');
-                    if (recognizedWords.join('') == numbersJoined) {
+                    var numbersJoined = numbers;
+                    if (recognizedWords.join('') == numbersJoined.reversed.join('')) {
                       score++;
                       _controller.incrementScore();
                     }
@@ -160,45 +170,13 @@ class _BackDigitState extends State<BackwardDigitSpan> {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Padding(
-            padding: EdgeInsets.only(top: 5.0, left: 16.0),
-            child: Text(
-              'Backward Digit Span',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
-          const Padding(
-            padding: EdgeInsets.only(
-                top: 5.0, left: 16.0, bottom: 16.0, right: 12.0),
-            child: Text(
-              'A list of numbers will be read to you. Please repeat them exactly in the same order.',
-              style: TextStyle(
-                fontSize: 18,
-                color: Colors.deepPurple,
-              ),
-            ),
-          ),
-          // Padding(
-          //   padding: const EdgeInsets.all(16.0),
-          //   child: Text(
-          //     'Score: $score',
-          //     style: const TextStyle(
-          //       fontSize: 18,
-          //       fontWeight: FontWeight.bold,
-          //     ),
-          //   ),
-          // ),
           Padding(
-            padding: const EdgeInsets.only(
-                top: 5.0, left: 16.0, bottom: 16.0, right: 12.0),
+            padding: const EdgeInsets.only(top: 5.0, left: 16.0, right: 16),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 const Text(
-                  'Numbers:',
+                  'Backward Digit Span',
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
@@ -217,35 +195,57 @@ class _BackDigitState extends State<BackwardDigitSpan> {
               ],
             ),
           ),
-          Center(
-            child: SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                child: Row(
-                  children: [
-                    for (var number in numbers) ...[
-                      const SizedBox(width: 8),
-                      Chip(
-                        label: Text(
-                          number,
-                          style: const TextStyle(
-                              fontSize: 18, color: Colors.deepPurple),
-                        ),
-                      ),
-                    ],
-                  ],
-                ),
+          const Padding(
+            padding: EdgeInsets.only(
+                top: 5.0, left: 16.0, bottom: 16.0, right: 12.0),
+            child: Text(
+              'Now another list of numbers will be read to you, but this time you must repeat them in the backwards order.',
+              style: TextStyle(
+                fontSize: 18,
+                color: Colors.deepPurple,
               ),
             ),
           ),
-          SizedBox(height: height * 0.05),
+          // Padding(
+          //   padding: const EdgeInsets.all(16.0),
+          //   child: Text(
+          //     'Score: $score',
+          //     style: const TextStyle(
+          //       fontSize: 18,
+          //       fontWeight: FontWeight.bold,
+          //     ),
+          //   ),
+          // ),
+          // Center(
+          //   child: SingleChildScrollView(
+          //     scrollDirection: Axis.horizontal,
+          //     child: Padding(
+          //       padding: const EdgeInsets.symmetric(horizontal: 16.0),
+          //       child: Row(
+          //         children: [
+          //           for (var number in numbers) ...[
+          //             const SizedBox(width: 8),
+          //             Chip(
+          //               label: Text(
+          //                 number,
+          //                 style: const TextStyle(
+          //                     fontSize: 18, color: Colors.deepPurple),
+          //               ),
+          //             ),
+          //           ],
+          //         ],
+          //       ),
+          //     ),
+          //   ),
+          // ),
+          SizedBox(height: height * 0.02),
           const Divider(
             thickness: 1,
             indent: 16,
             endIndent: 16,
             color: Colors.deepPurple,
           ),
+          SizedBox(height: height * 0.1),
           Padding(
             padding: const EdgeInsets.only(top: 50),
             child: SingleChildScrollView(
@@ -260,7 +260,7 @@ class _BackDigitState extends State<BackwardDigitSpan> {
                 child: Obx(
                   () => Text(
                     _controller.starttest.value
-                        ? "Double top the button to start test"
+                        ? "Double tap the button to start test"
                         : _controller.text.value,
                     style: TextStyle(
                       fontSize: 20,

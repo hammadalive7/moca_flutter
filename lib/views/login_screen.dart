@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:moca/views/home_screen.dart';
 import 'package:moca/views/signup_screen.dart';
-import 'package:moca/views/sociodemographic_sceen.dart';
 import '../controllers/login_controller.dart';
 
 class LogInScreen extends StatefulWidget {
@@ -74,7 +74,16 @@ class _LogInScreenState extends State<LogInScreen> {
                             return 'Please Enter Valid Email';
                           } else if (value.contains('..')) {
                             return 'Please Enter Valid Email';
+                          } else if (value.contains('examples')) {
+                            return 'Please Enter Valid Email';
+                          } else if (value.contains('example')) {
+                            return 'Please Enter Valid Email';
+                          } else if (value.contains('@test')) {
+                            return 'Please Enter Valid Email';
+                          } else if (value.contains('@testing')) {
+                            return 'Please Enter Valid Email';
                           }
+
                           return null;
                         },
                       ),
@@ -115,10 +124,19 @@ class _LogInScreenState extends State<LogInScreen> {
                         },
                         validator: (value) {
                           if (value == null || value.isEmpty) {
+                            setState(() {
+                              _isloading = false;
+                            });
                             return 'Please enter password';
                           } else if (value.length < 6) {
+                            setState(() {
+                              _isloading = false;
+                            });
                             return 'Password must be at least 6 characters!';
                           } else if (value.contains(' ')) {
+                            setState(() {
+                              _isloading = false;
+                            });
                             return 'Password must not contain space!';
                           }
                           return null;
@@ -152,8 +170,8 @@ class _LogInScreenState extends State<LogInScreen> {
                                     setState(() {
                                       _isloading = false;
                                     });
-                                    Get.to(
-                                      () => const SocioDemographicScreen(),
+                                    Get.offAll(
+                                      () => const HomeScreen(),
                                     );
                                   } else {
                                     setState(() {

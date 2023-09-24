@@ -20,7 +20,7 @@ class _ForwardDigitState extends State<ForwardDigitSpan> {
   FlutterTts flutterTts = FlutterTts();
   final DigitSpanController _controller = Get.put(DigitSpanController());
   int score = 0;
-  var numbers = ['2', '4', '5', '7', '9'];
+  var numbers = ['2', '1', '8', '5', '4'];
   bool isTimerStarted = false;
   bool innNextScreen = false;
 
@@ -59,12 +59,12 @@ class _ForwardDigitState extends State<ForwardDigitSpan> {
     _controller.remainingSeconds;
   }
 
-
   void nextTest() {
+    int score = _controller.getScore();
     sf.setInt('nextGame', 7);
     innNextScreen = true;
     _controller.remainingSeconds.value = 0;
-    Get.offAll(() => const BackwardDigitSpan());
+    Get.offAll(() =>  BackwardDigitSpan(ForwardScore: score));
   }
 
   void _speakNumbers() async {
@@ -75,7 +75,6 @@ class _ForwardDigitState extends State<ForwardDigitSpan> {
     }
     _controller.isReading.value = false;
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -101,13 +100,14 @@ class _ForwardDigitState extends State<ForwardDigitSpan> {
                 _controller.isListening.value = true;
                 speechToText.listen(
                   onResult: (result) {
-                      _controller.text.value = result.recognizedWords;
-                      var recognizedWords = _controller.text.replaceAll('', ' ').split(' ');
-                      var numbersJoined = numbers.join('');
-                      if (recognizedWords.join('') == numbersJoined) {
-                        score++;
-                        _controller.incrementScore();
-                      }
+                    _controller.text.value = result.recognizedWords;
+                    var recognizedWords =
+                        _controller.text.replaceAll('', ' ').split(' ');
+                    var numbersJoined = numbers.join('');
+                    if (recognizedWords.join('') == numbersJoined) {
+                      score++;
+                      _controller.incrementScore();
+                    }
                   },
                 );
               }
@@ -132,9 +132,9 @@ class _ForwardDigitState extends State<ForwardDigitSpan> {
             () => CircleAvatar(
               backgroundColor: _controller.starttest.value
                   ? Colors.deepPurple
-                      :_controller.isReading.value
-                          ? Colors.grey
-                          : Colors.deepPurple,
+                  : _controller.isReading.value
+                      ? Colors.grey
+                      : Colors.deepPurple,
               radius: 40,
               child: Obx(
                 () => Icon(
@@ -162,14 +162,29 @@ class _ForwardDigitState extends State<ForwardDigitSpan> {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Padding(
-            padding: EdgeInsets.only(top: 5.0, left: 16.0),
-            child: Text(
-              'Forward Digit Span',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
+          Padding(
+            padding: const EdgeInsets.only(top: 5.0, left: 16.0, right: 16),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text(
+                  'Forward Digit Span',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                Obx(
+                  () => Text(
+                    '${_controller.remainingSeconds}',
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.deepPurple,
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
           const Padding(
@@ -193,61 +208,37 @@ class _ForwardDigitState extends State<ForwardDigitSpan> {
           //     ),
           //   ),
           // ),
-          Padding(
-            padding: const EdgeInsets.only(
-                top: 5.0, left: 16.0, bottom: 16.0, right: 12.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text(
-                  'Numbers:',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                Obx(
-                  () => Text(
-                    '${_controller.remainingSeconds}',
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.deepPurple,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          Center(
-            child: SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                child: Row(
-                  children: [
-                    for (var number in numbers) ...[
-                      const SizedBox(width: 8),
-                      Chip(
-                        label: Text(
-                          number,
-                          style: const TextStyle(
-                              fontSize: 18, color: Colors.deepPurple),
-                        ),
-                      ),
-                    ],
-                  ],
-                ),
-              ),
-            ),
-          ),
+          // Center(
+          //   child: SingleChildScrollView(
+          //     scrollDirection: Axis.horizontal,
+          //     child: Padding(
+          //       padding: const EdgeInsets.symmetric(horizontal: 16.0),
+          //       child: Row(
+          //         children: [
+          //           for (var number in numbers) ...[
+          //             const SizedBox(width: 8),
+          //             Chip(
+          //               label: Text(
+          //                 number,
+          //                 style: const TextStyle(
+          //                     fontSize: 18, color: Colors.deepPurple),
+          //               ),
+          //             ),
+          //           ],
+          //         ],
+          //       ),
+          //     ),
+          //   ),
+          // ),
           SizedBox(height: height * 0.05),
+
           const Divider(
             thickness: 1,
             indent: 16,
             endIndent: 16,
             color: Colors.deepPurple,
           ),
+          SizedBox(height: height * 0.1),
           Padding(
             padding: const EdgeInsets.only(top: 50),
             child: SingleChildScrollView(
@@ -262,11 +253,13 @@ class _ForwardDigitState extends State<ForwardDigitSpan> {
                 child: Obx(
                   () => Text(
                     _controller.starttest.value
-                        ? "Double top the button to start test"
+                        ? "Double tap the button to start test"
                         : _controller.text.value,
                     style: TextStyle(
                       fontSize: 20,
-                      color: _controller.isListening.value ? Colors.deepPurple : Colors.black54,
+                      color: _controller.isListening.value
+                          ? Colors.deepPurple
+                          : Colors.black54,
                     ),
                     textAlign: TextAlign.center,
                   ),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:moca/views/symptoms_initial_illness_screen.dart';
+
 import '../controllers/covidexperience_controller.dart';
 
 class CovidExperienceScreen extends StatefulWidget {
@@ -13,11 +14,12 @@ class CovidExperienceScreen extends StatefulWidget {
 class _CovidExperienceScreenState extends State<CovidExperienceScreen> {
   final _formKey = GlobalKey<FormState>();
   bool isVisible = true;
+  bool isVisible2 = true;
   bool _isloading = false;
 
   // Create an instance of the controller
   final CovidExperienceController _controller =
-      Get.put(CovidExperienceController());
+  Get.put(CovidExperienceController());
 
   @override
   Widget build(BuildContext context) {
@@ -25,13 +27,13 @@ class _CovidExperienceScreenState extends State<CovidExperienceScreen> {
       appBar: AppBar(
         title: const Center(
             child: Text(
-          'Covid Experience Data',
-          style: TextStyle(
-            fontSize: 28,
-            fontWeight: FontWeight.bold,
-            color: Colors.deepPurple,
-          ),
-        )),
+              'Covid Experience Data',
+              style: TextStyle(
+                fontSize: 28,
+                fontWeight: FontWeight.bold,
+                color: Colors.deepPurple,
+              ),
+            )),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -216,36 +218,40 @@ class _CovidExperienceScreenState extends State<CovidExperienceScreen> {
                       color: Colors.black12,
                     ),
                     const SizedBox(height: 16),
-                    const Text(
-                      'If you did not get your PCR test done, how do you know you have had COVID-19?',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.deepPurple,
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    TextFormField(
-                      decoration: const InputDecoration(
-                        hintText: 'Please share your Experience',
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.all(
-                            Radius.circular(12),
-                          ),
-                        ),
-                      ),
-                      onChanged: (value) {
-                        setState(() {
-                          _controller.pcrTestDetails = value;
-                        });
-                      },
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Please share your Experience';
-                        }
-                        return null;
-                      },
-                    ),
+                    Visibility(
+                        visible: isVisible,
+                        child: Column(
+                          children: [
+                            const Text(
+                              'If you did not get your PCR test done, how do you know you have had COVID-19?',
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.deepPurple,
+                              ),
+                            ),
+                            const SizedBox(height: 16),
+                            TextFormField(
+                              decoration: const InputDecoration(
+                                hintText: 'Please share your Experience',
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.all(
+                                    Radius.circular(12),
+                                  ),
+                                ),
+                              ),
+                              onChanged: (value) {
+                                setState(() {
+                                  _controller.pcrTestDetails = value;
+                                });
+                              },
+                              validator: (value) {
+                                return null;
+                              },
+                            ),
+                          ],
+                        )),
+
                     const SizedBox(height: 16),
                     const Divider(
                       color: Colors.black12,
@@ -366,6 +372,30 @@ class _CovidExperienceScreenState extends State<CovidExperienceScreen> {
                             ),
                           ],
                         ),
+                        Visibility(
+                          visible: !isVisible,
+                          child: Row(
+                            children: [
+                              Radio(
+                                value: 'N/A',
+                                groupValue: _controller.duration,
+                                onChanged: (value) {
+                                  setState(() {
+                                    _controller.duration = value!;
+                                  });
+                                },
+                              ),
+                              const Text(
+                                'N/A',
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w400,
+                                  color: Colors.deepPurple,
+                                ),
+                              ),
+                            ],
+                          ),
+                        )
                       ],
                     ),
                     const SizedBox(height: 16),
@@ -374,7 +404,7 @@ class _CovidExperienceScreenState extends State<CovidExperienceScreen> {
                     ),
                     const SizedBox(height: 16),
                     const Text(
-                      'How would you describe your experience with COVID-19 in the first 4 weeks? ',
+                      'How would you describe your experience with COVID-19?',
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
@@ -387,10 +417,10 @@ class _CovidExperienceScreenState extends State<CovidExperienceScreen> {
                           children: [
                             Radio(
                               value: 'Asymptomatic',
-                              groupValue: _controller.first4weeks,
+                              groupValue: _controller.coivdExp,
                               onChanged: (value) {
                                 setState(() {
-                                  _controller.first4weeks = value!;
+                                  _controller.coivdExp = value!;
                                 });
                               },
                             ),
@@ -408,10 +438,10 @@ class _CovidExperienceScreenState extends State<CovidExperienceScreen> {
                           children: [
                             Radio(
                               value: 'Mild',
-                              groupValue: _controller.first4weeks,
+                              groupValue: _controller.coivdExp,
                               onChanged: (value) {
                                 setState(() {
-                                  _controller.first4weeks = value!;
+                                  _controller.coivdExp = value!;
                                 });
                               },
                             ),
@@ -429,10 +459,10 @@ class _CovidExperienceScreenState extends State<CovidExperienceScreen> {
                           children: [
                             Radio(
                               value: 'Moderate',
-                              groupValue: _controller.first4weeks,
+                              groupValue: _controller.coivdExp,
                               onChanged: (value) {
                                 setState(() {
-                                  _controller.first4weeks = value!;
+                                  _controller.coivdExp = value!;
                                 });
                               },
                             ),
@@ -450,10 +480,10 @@ class _CovidExperienceScreenState extends State<CovidExperienceScreen> {
                           children: [
                             Radio(
                               value: 'Severe (hospitalized/oxygen therapy)',
-                              groupValue: _controller.first4weeks,
+                              groupValue: _controller.coivdExp,
                               onChanged: (value) {
                                 setState(() {
-                                  _controller.first4weeks = value!;
+                                  _controller.coivdExp = value!;
                                 });
                               },
                             ),
@@ -487,11 +517,11 @@ class _CovidExperienceScreenState extends State<CovidExperienceScreen> {
                           children: [
                             Radio(
                               value:
-                                  'Critically severe (ICU/mechanical ventilation)',
-                              groupValue: _controller.first4weeks,
+                              'Critically severe (ICU/mechanical ventilation)',
+                              groupValue: _controller.coivdExp,
                               onChanged: (value) {
                                 setState(() {
-                                  _controller.first4weeks = value!;
+                                  _controller.coivdExp = value!;
                                 });
                               },
                             ),
@@ -499,7 +529,7 @@ class _CovidExperienceScreenState extends State<CovidExperienceScreen> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  'Critically severe(ICU/mechanical',
+                                  'Critically severe(ICU/',
                                   style: TextStyle(
                                     fontSize: 18,
                                     fontWeight: FontWeight.w400,
@@ -507,7 +537,7 @@ class _CovidExperienceScreenState extends State<CovidExperienceScreen> {
                                   ),
                                 ),
                                 Text(
-                                  'ventilation)',
+                                  'mechanical ventilation)',
                                   style: TextStyle(
                                     fontSize: 18,
                                     fontWeight: FontWeight.w400,
@@ -518,6 +548,30 @@ class _CovidExperienceScreenState extends State<CovidExperienceScreen> {
                             ),
                           ],
                         ),
+                        Visibility(
+                          visible: !isVisible,
+                          child: Row(
+                            children: [
+                              Radio(
+                                value: 'N/A',
+                                groupValue: _controller.coivdExp,
+                                onChanged: (value) {
+                                  setState(() {
+                                    _controller.coivdExp = value!;
+                                  });
+                                },
+                              ),
+                              const Text(
+                                'N/A',
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w400,
+                                  color: Colors.deepPurple,
+                                ),
+                              ),
+                            ],
+                          ),
+                        )
                       ],
                     ),
                     const SizedBox(height: 16),
@@ -526,92 +580,156 @@ class _CovidExperienceScreenState extends State<CovidExperienceScreen> {
                     ),
                     const SizedBox(height: 16),
                     const Text(
-                      'How would you describe your experience with COVID-19 after the first 4 weeks? ',
+                      'Did you get vaccinated against COVID-19? ',
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
                         color: Colors.deepPurple,
                       ),
                     ),
-                    Column(
+                    Row(
                       children: [
-                        Row(
-                          children: [
-                            Radio(
-                              value: 'I recovered completely  ',
-                              groupValue: _controller.week4Experience,
-                              onChanged: (value) {
-                                setState(() {
-                                  _controller.week4Experience = value!;
-                                });
-                              },
-                            ),
-                            const Text(
-                              'I recovered completely',
-                              style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.w400,
-                                color: Colors.deepPurple,
-                              ),
-                            ),
-                          ],
+                        Radio(
+                          value: 'Yes',
+                          groupValue: _controller.vaccinated,
+                          onChanged: (value) {
+                            setState(() {
+                              _controller.vaccinated = value!;
+                              isVisible2 = true;
+                            });
+                          },
                         ),
-                        Row(
-                          children: [
-                            Radio(
-                              value: 'I have ongoing, mild/ moderate symptoms',
-                              groupValue: _controller.week4Experience,
-                              onChanged: (value) {
-                                setState(() {
-                                  _controller.week4Experience = value!;
-                                });
-                              },
-                            ),
-                            const Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'I have ongoing, mild',
-                                  style: TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.w400,
-                                    color: Colors.deepPurple,
-                                  ),
-                                ),
-                                Text(
-                                  '/ moderate symptoms',
-                                  style: TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.w400,
-                                    color: Colors.deepPurple,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
+                        const Text(
+                          'Yes',
+                          style: TextStyle(
+                            fontSize: 18,
+                            color: Colors.deepPurple,
+                            fontWeight: FontWeight.w400,
+                          ),
                         ),
-                        Row(
-                          children: [
-                            Radio(
-                              value: 'I have ongoing, severe symptoms',
-                              groupValue: _controller.week4Experience,
-                              onChanged: (value) {
-                                setState(() {
-                                  _controller.week4Experience = value!;
-                                });
-                              },
-                            ),
-                            const Text(
-                              'I have ongoing, severe symptoms',
-                              style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.w400,
-                                color: Colors.deepPurple,
-                              ),
-                            ),
-                          ],
+                        Radio(
+                          value: 'No',
+                          groupValue: _controller.vaccinated,
+                          onChanged: (value) {
+                            setState(() {
+                              _controller.vaccinated = value!;
+                              isVisible2 = false;
+                              if (isVisible2 == false) {
+                                _controller.vaccinationPeriod = 'none';
+                              }
+                            });
+                          },
+                        ),
+                        const Text(
+                          'No',
+                          style: TextStyle(
+                            fontSize: 18,
+                            color: Colors.deepPurple,
+                            fontWeight: FontWeight.w400,
+                          ),
                         ),
                       ],
+                    ),
+                    /////Q2
+                    Visibility(
+                      visible: isVisible2,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const SizedBox(height: 16),
+                          const Divider(
+                            color: Colors.black12,
+                          ),
+                          const SizedBox(height: 16),
+                          const Text(
+                            ' If yes, when did you get vaccinated against COVID-19?',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.deepPurple,
+                            ),
+                          ),
+                          Column(
+                            children: [
+                              Row(
+                                children: [
+                                  Radio(
+                                    value:
+                                    ' Before getting infected with COVID-19 ',
+                                    groupValue: _controller.vaccinationPeriod,
+                                    onChanged: (value) {
+                                      setState(() {
+                                        _controller.vaccinationPeriod = value!;
+                                      });
+                                    },
+                                  ),
+                                  const Flexible(
+                                    child: Text(
+                                      ' Before getting infected with COVID-19 ',
+                                      style: TextStyle(
+                                        fontSize: 18,
+                                        color: Colors.deepPurple,
+                                        fontWeight: FontWeight.w400,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              Row(
+                                children: [
+                                  Radio(
+                                    value:
+                                    'After getting infected with COVID-19 ',
+                                    groupValue: _controller.vaccinationPeriod,
+                                    onChanged: (value) {
+                                      setState(() {
+                                        _controller.vaccinationPeriod = value!;
+                                      });
+                                    },
+                                  ),
+                                  const Flexible(
+                                    child: Text(
+                                      'After getting infected with COVID-19 ',
+                                      style: TextStyle(
+                                        fontSize: 18,
+                                        color: Colors.deepPurple,
+                                        fontWeight: FontWeight.w400,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              Visibility(
+                                  visible: !isVisible,
+                                  child: Row(
+                                    children: [
+                                      Radio(
+                                        value: 'N/A',
+                                        groupValue:
+                                        _controller.vaccinationPeriod,
+                                        onChanged: (value) {
+                                          setState(() {
+                                            _controller.vaccinationPeriod =
+                                            value!;
+                                          });
+                                        },
+                                      ),
+                                      const Flexible(
+                                        child: Text(
+                                          'N/A',
+                                          style: TextStyle(
+                                            fontSize: 18,
+                                            color: Colors.deepPurple,
+                                            fontWeight: FontWeight.w400,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  )),
+                            ],
+                          ),
+                        ],
+                      ),
                     ),
                     const SizedBox(height: 16),
                     const Divider(
@@ -639,23 +757,26 @@ class _CovidExperienceScreenState extends State<CovidExperienceScreen> {
                                 setState(() {
                                   _isloading = true;
                                 });
-                                if (_formKey.currentState!.validate() &&
-                                    _controller.covid != '' &&
-                                    _controller.pcrTest != '' &&
-                                    _controller.result != '' &&
+                                if (_controller.covid != '' &&
+                                    // _controller.pcrTest != '' &&
+                                    // _controller.result != '' &&
                                     _controller.duration != '' &&
-                                    _controller.first4weeks != '' &&
-                                    _controller.week4Experience != '' &&
-                                    _controller.pcrTestDetails != '') {
+                                    // _controller.coivdExp != '' &&
+                                    _controller.vaccinated != '' &&
+                                    _controller.vaccinationPeriod != ''
+                                // _controller.pcrTestDetails != ''
+
+                                ) {
                                   _controller
                                       .submitFormMethod(
                                     pcrTest: _controller.pcrTest,
                                     covid: _controller.covid,
                                     result: _controller.result,
                                     duration: _controller.duration,
-                                    first4weeks: _controller.first4weeks,
-                                    week4Experience:
-                                        _controller.week4Experience,
+                                    coivdExp: _controller.coivdExp,
+                                    vaccinated: _controller.vaccinated,
+                                    vaccinationPeriod:
+                                    _controller.vaccinationPeriod,
                                     pcrTestDetails: _controller.pcrTestDetails,
                                   )
                                       .then((value) {
@@ -664,8 +785,8 @@ class _CovidExperienceScreenState extends State<CovidExperienceScreen> {
                                         _isloading = false;
                                       });
                                       Get.offAll(
-                                        () =>
-                                            const SymptomsInitialIllnessScreen(),
+                                            () =>
+                                        const SymptomsInitialIllnessScreen(),
                                       );
                                     }
                                   });
@@ -674,11 +795,20 @@ class _CovidExperienceScreenState extends State<CovidExperienceScreen> {
                                     _isloading = false;
                                   });
                                   Get.snackbar(
-                                    'Missing Fields',
-                                    'Please fill all the fields',
-                                    snackPosition: SnackPosition.BOTTOM,
-                                    backgroundColor: Colors.red,
+                                    'Missing Fields!',
+                                    'Please complete the form!',
+                                    titleText: const Text(
+                                      'Attention!',
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 20,
+                                      ),
+                                    ),
+                                    snackPosition: SnackPosition.TOP,
+                                    backgroundColor: Colors.red.shade500,
                                     colorText: Colors.white,
+                                    snackStyle: SnackStyle.FLOATING,
                                   );
                                 }
                               } catch (e) {
@@ -687,49 +817,58 @@ class _CovidExperienceScreenState extends State<CovidExperienceScreen> {
                                 });
                                 debugPrint('Error: $e');
                                 Get.snackbar(
-                                  'Error',
-                                  'Error: $e',
-                                  snackPosition: SnackPosition.BOTTOM,
-                                  backgroundColor: Colors.red,
+                                  'Attention!',
+                                  'Some Error Occured!',
+                                  titleText: const Text(
+                                    'Attention!',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 20,
+                                    ),
+                                  ),
+                                  snackPosition: SnackPosition.TOP,
+                                  backgroundColor: Colors.red.shade500,
                                   colorText: Colors.white,
+                                  snackStyle: SnackStyle.FLOATING,
                                 );
                               }
                             },
                             child: _isloading == true
                                 ? const Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Text(
-                                        "Loading",
-                                        style: TextStyle(
-                                          fontSize: 20,
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.white,
-                                        ),
-                                      ),
-                                      SizedBox(
-                                        width: 5,
-                                      ),
-                                      SizedBox(
-                                        height: 20,
-                                        width: 20,
-                                        child: CircularProgressIndicator(
-                                          valueColor: AlwaysStoppedAnimation(
-                                              Colors.white),
-                                          backgroundColor: Colors.blue,
-                                          strokeWidth: 4,
-                                        ),
-                                      )
-                                    ],
-                                  )
-                                : const Text(
-                                    'Submit',
-                                    style: TextStyle(
-                                      fontSize: 20,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.white,
-                                    ),
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(
+                                  "Loading",
+                                  style: TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
                                   ),
+                                ),
+                                SizedBox(
+                                  width: 5,
+                                ),
+                                SizedBox(
+                                  height: 20,
+                                  width: 20,
+                                  child: CircularProgressIndicator(
+                                    valueColor: AlwaysStoppedAnimation(
+                                        Colors.white),
+                                    backgroundColor: Colors.blue,
+                                    strokeWidth: 4,
+                                  ),
+                                )
+                              ],
+                            )
+                                : const Text(
+                              'Next',
+                              style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
+                            ),
                           ),
                         ),
                       ),

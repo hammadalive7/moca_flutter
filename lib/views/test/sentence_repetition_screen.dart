@@ -28,7 +28,7 @@ class SentenceRepetitionScreenState extends State<SentenceRepetitionScreen> {
   RxString spokenSentence = 'Hold the button and start speaking'.obs;
   var sentences = [
     'I only know that John is the one to help today',
-    'The cat always hides under the couch when dogs are in the room',
+    'The cat always hid under the couch when dogs were in the room',
   ];
   int currentSentenceIndex = 0;
   RxString recognizedText = 'Hold the button and start speaking'.obs;
@@ -68,7 +68,7 @@ class SentenceRepetitionScreenState extends State<SentenceRepetitionScreen> {
     isTimerStarted = false;
     if (gotoNextSentence == false) {
       goToNextSentence();
-    }else if(gotoNextSentence == true && gotoNextScreen == false){
+    } else if (gotoNextSentence == true && gotoNextScreen == false) {
       nextTest();
     }
   }
@@ -84,8 +84,8 @@ class SentenceRepetitionScreenState extends State<SentenceRepetitionScreen> {
   void nextTest() {
     gotoNextScreen = true;
     sf.setInt('nextGame', 11);
-    _controller.remainingSeconds.value = 2;
     Future.delayed(const Duration(seconds: 3), () {
+      _controller.remainingSeconds.value = 0;
       Get.offAll(() => const VocabularyScreen());
     });
   }
@@ -115,7 +115,6 @@ class SentenceRepetitionScreenState extends State<SentenceRepetitionScreen> {
     spokenSentence.value = 'Hold the button and start speaking';
     currentSentenceIndex++;
 
-
     if (secondSentence.value) {
       _controller.disableMicButton();
       secondSentence.value = false;
@@ -123,7 +122,7 @@ class SentenceRepetitionScreenState extends State<SentenceRepetitionScreen> {
         _speakSentence();
       });
     } else {
-        nextTest();
+      nextTest();
     }
   }
 
@@ -155,10 +154,24 @@ class SentenceRepetitionScreenState extends State<SentenceRepetitionScreen> {
                     if (result.finalResult) {
                       spokenSentence.value = result.recognizedWords.trim();
                       var targetSentence = sentences[currentSentenceIndex];
+                      // Split the target sentence and spoken sentence into words
+                      var targetWords = targetSentence.toLowerCase().split(' ');
+                      var spokenWords = spokenSentence.toLowerCase().split(' ');
+                      // Initialize a variable to keep track of the number of correct words
+                      int correctWordCount = 0;
+
+                      // Compare each word in the target sentence with the spoken sentence
+                      for (int i = 0;
+                          i < targetWords.length && i < spokenWords.length;
+                          i++) {
+                        if (targetWords[i] == spokenWords[i]) {
+                          correctWordCount++;
+                        }
+                      }
                       if (spokenSentence.toLowerCase() ==
-                          targetSentence.toLowerCase()) {
+                          targetSentence.toLowerCase() || correctWordCount >= 10) {
                         score++;
-                        _controller.incrementScore();
+                        // _controller.incrementScore();
                       }
                       Future.delayed(const Duration(seconds: 3), () {
                         goToNextSentence();
@@ -172,6 +185,7 @@ class SentenceRepetitionScreenState extends State<SentenceRepetitionScreen> {
                 debugPrint('Speech recognition is not available');
               }
             }
+            _controller.updateScore(score);
           },
           onTapUp: (details) {
             isListening.value = false;
@@ -237,6 +251,17 @@ class SentenceRepetitionScreenState extends State<SentenceRepetitionScreen> {
                 ),
               ),
             ),
+            const Padding(
+              padding: EdgeInsets.only(left: 16, right: 16),
+              child: Text(
+                "Try to speak clearly and slowly into the microphone",
+                style: TextStyle(
+                  fontSize: 18,
+                  color: Colors.deepPurple,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
             SizedBox(height: height * 0.03),
             const Divider(
               color: Colors.deepPurple,
@@ -267,9 +292,11 @@ class SentenceRepetitionScreenState extends State<SentenceRepetitionScreen> {
               child: Center(
                 child: Obx(
                   () => Text(
-                    isListening.value
-                        ? recognizedText.value
-                        : spokenSentence.value,
+                    starttest.value
+                        ? isListening.value
+                            ? recognizedText.value
+                            : spokenSentence.value
+                        : "Double tap the button to start test",
                     style: TextStyle(
                       fontSize: 18,
                       color: isListening.value

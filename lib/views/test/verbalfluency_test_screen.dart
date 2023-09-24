@@ -75,14 +75,28 @@ class _VocabularyScreenState extends State<VocabularyScreen> {
               right: 10,
             ),
             child: Text(
-              '''Tell as many words as you can think of that begin with a given letter in 60 second. You can say any kind of Grammatical word you want.''',
+              '''Tell as many words as you can think of that begin with a certain letter of the alphabet that you will be told once you click on the 60 second timer. You can say any kind of word you want, except for proper nouns, numbers, or words that begin with the same sound but have a different suffix, for example, love, lover, loving.''',
               style: TextStyle(
                 fontSize: 18,
                 color: Colors.deepPurple,
               ),
             ),
           ),
-          SizedBox(height: MediaQuery.sizeOf(context).height * 0.03),
+          const Padding(
+            padding: EdgeInsets.only(
+              left: 16,
+              right: 10,
+            ),
+            child: Text(
+              "Try to at least speak 2 or more words at a time for better detection.",
+              style: TextStyle(
+                fontSize: 18,
+                color: Colors.deepPurple,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+          SizedBox(height: MediaQuery.sizeOf(context).height * 0.015),
           const Divider(
             height: 1,
             thickness: 1,
@@ -113,13 +127,13 @@ class _VocabularyScreenState extends State<VocabularyScreen> {
               ],
             ),
           ),
-          SizedBox(height: MediaQuery.sizeOf(context).height * 0.2),
+          SizedBox(height: MediaQuery.sizeOf(context).height * 0.1),
           Center(
             child: Padding(
               padding: const EdgeInsets.only(left: 16, right: 16),
               child: Text(
                 starttest
-                    ? "Double top the button to start test"
+                    ? "Double tap the button to start test"
                     : "Hold the button and start speaking",
                 style: const TextStyle(
                   fontSize: 18,
@@ -128,7 +142,7 @@ class _VocabularyScreenState extends State<VocabularyScreen> {
               ),
             ),
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 10),
           Padding(
             padding: const EdgeInsets.only(left: 16, right: 16),
             child: Center(
@@ -175,26 +189,24 @@ class _VocabularyScreenState extends State<VocabularyScreen> {
           },
           onLongPressUp: _stopListening,
           child: CircleAvatar(
-              backgroundColor: starttest
-                  ? Colors.deepPurple
-                  : isTimerStarted
-                      ? Colors.deepPurple
-                      : Colors.grey,
-              radius: 40,
-              child: Icon(
-                  starttest
-                      ? Icons.double_arrow_rounded
-                      : _controller.isListening.value
-                          ? Icons.mic
-                          : Icons.mic_none,
-                  color: Colors.white,
-                  size: 40,
-                ),
-              ),
+            backgroundColor: starttest
+                ? Colors.deepPurple
+                : isTimerStarted
+                    ? Colors.deepPurple
+                    : Colors.grey,
+            radius: 40,
+            child: Icon(
+              starttest
+                  ? Icons.double_arrow_rounded
+                  : _controller.isListening.value
+                      ? Icons.mic
+                      : Icons.mic_none,
+              color: Colors.white,
+              size: 40,
             ),
           ),
-
-
+        ),
+      ),
     );
   }
 
@@ -222,7 +234,7 @@ class _VocabularyScreenState extends State<VocabularyScreen> {
 
   Future<void> _calculateScore() async {
     var score = 0;
-    if (words.length >= 5) {
+    if (words.length >= 11) {
       score = 1;
       await _controller.updateScore(score);
     } else {
@@ -237,6 +249,7 @@ class _VocabularyScreenState extends State<VocabularyScreen> {
 
   void _showDialog() {
     showDialog(
+      barrierDismissible: false,
       context: context,
       builder: (context) => AlertDialog(
         title: const Text(
@@ -258,7 +271,7 @@ class _VocabularyScreenState extends State<VocabularyScreen> {
           TextButton(
             onPressed: () {
               sf.setInt('nextGame', 12);
-              Get.offAll(() => AbstractionScreen());
+              Get.offAll(() => const AbstractionScreen());
             },
             child: const Text(
               'Next',
@@ -275,8 +288,8 @@ class _VocabularyScreenState extends State<VocabularyScreen> {
   }
 
   void _speakRandomLetter() async {
-    var alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-    var randomLetter = alphabet[DateTime.now().second % 26];
+    // var alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    var randomLetter = 'F';
     setState(() {
       currentLetter = randomLetter;
     });

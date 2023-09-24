@@ -48,7 +48,6 @@ class _Serial7State extends State<Serial7Screen> {
     sf = await SharedPreferences.getInstance();
   }
 
-
   void _startTest() {
     if (isTimerStarted == false) {
       isTimerStarted = true;
@@ -92,10 +91,10 @@ class _Serial7State extends State<Serial7Screen> {
         } else {
           _speakTarget();
         }
-        target -= 7;
+        target = target - 7;
       } else {
         attempts++;
-        _showSnackbar("Wrong Input! Try Again");
+        //_showSnackbar("Wrong Input! Try Again");
         if (attempts.value == maxAttempts.value) {
           await finalScore();
           Future.delayed(const Duration(seconds: 3), () {
@@ -113,7 +112,6 @@ class _Serial7State extends State<Serial7Screen> {
   }
 
   void _showPopup() {
-
     alert = true;
     showDialog(
       context: context,
@@ -135,11 +133,6 @@ class _Serial7State extends State<Serial7Screen> {
         );
       },
     );
-  }
-
-  void _showSnackbar(String message) {
-    ScaffoldMessenger.of(context)
-        .showSnackBar(SnackBar(content: Text(message)));
   }
 
   @override
@@ -228,10 +221,21 @@ class _Serial7State extends State<Serial7Screen> {
           const Padding(
             padding: EdgeInsets.only(top: 5, left: 16, right: 16),
             child: Text(
-              'Count backwards from 100 by subtracting 7. Do a total of 5 subtractions.',
+              'Count backwards from 100 by subtracting 7. Do a total of 5 subtractions. Speak the number after each subtraction.',
               style: TextStyle(
                 fontSize: 16,
                 color: Colors.deepPurple,
+              ),
+            ),
+          ),
+          const Padding(
+            padding: EdgeInsets.only(top: 5, left: 16, right: 16),
+            child: Text(
+              'Example: 50 - 5 = 45 (You just have to speak the Answer into the mic).',
+              style: TextStyle(
+                fontSize: 16,
+                color: Colors.deepPurple,
+                fontWeight: FontWeight.bold,
               ),
             ),
           ),
@@ -249,13 +253,14 @@ class _Serial7State extends State<Serial7Screen> {
             children: [
               Padding(
                 padding: const EdgeInsets.all(16.0),
-                child: Obx(() => Text(
-                  'Attempts Left: ${maxAttempts.value - attempts.value}',
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
+                child: Obx(
+                  () => Text(
+                    'Attempts Left: ${maxAttempts.value - attempts.value}',
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
-                ),
                 ),
               ),
               Padding(
@@ -288,7 +293,9 @@ class _Serial7State extends State<Serial7Screen> {
                 margin: const EdgeInsets.only(bottom: 150),
                 child: Obx(
                   () => Text(
-                    _controller.text.value,
+                    _controller.starttest.value
+                        ? _controller.text.value
+                        : "Double tap the button to start test",
                     style: TextStyle(
                       fontSize: 20,
                       color: _controller.isListening.value

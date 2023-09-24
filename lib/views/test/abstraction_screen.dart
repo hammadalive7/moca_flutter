@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:moca/controllers/abstraction_controller.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class AbstractionScreen extends StatefulWidget {
+  const AbstractionScreen({super.key});
+
   @override
   _AbstractionScreenState createState() => _AbstractionScreenState();
 }
@@ -10,6 +13,16 @@ class AbstractionScreen extends StatefulWidget {
 class _AbstractionScreenState extends State<AbstractionScreen> {
   List<bool> taskResults = List<bool>.filled(3, false);
   final controller = Get.put(AbstractionController());
+  late SharedPreferences sf;
+  @override
+  initState() {
+    super.initState();
+    initalizeSharedPref();
+  }
+
+  Future<void> initalizeSharedPref() async {
+    sf = await SharedPreferences.getInstance();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -25,7 +38,9 @@ class _AbstractionScreenState extends State<AbstractionScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const Text(
-                  'Please perform the following abstraction tasks:',
+                  'What do each of the following pair of words have in common?'
+                      ' For example, what do “banana” and “orange” have in common?'
+                      ' They are both fruits.',
                   style: TextStyle(
                     fontSize: 18.0,
                     color: Colors.deepPurple,
@@ -58,8 +73,8 @@ class _AbstractionScreenState extends State<AbstractionScreen> {
                       ),
                       TaskItem(
                         statement: 'Watch-Ruler',
-                        options: const ['Fruit', 'Color', 'Tool', 'Animal'],
-                        result: 'Tool',
+                        options: const ['Fruit', 'Color', 'Measuring Tool', 'Animal'],
+                        result: 'Measuring Tool',
                         onChanged: (result) {
                           setState(() {
                             taskResults[2] = result;
@@ -83,6 +98,7 @@ class _AbstractionScreenState extends State<AbstractionScreen> {
                       ),
                       onPressed: () async {
                         controller.submitTaskResults(taskResults);
+                        sf.setInt('nextGame', 13);
                       },
                       child: const Text(
                         'Submit',
@@ -110,7 +126,8 @@ class TaskItem extends StatefulWidget {
   final String result;
   final ValueChanged<bool> onChanged;
 
-  TaskItem({
+  const TaskItem({
+    super.key,
     required this.statement,
     required this.options,
     required this.result,

@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:moca/views/animal_name_screen.dart';
-import 'package:moca/views/test/cube_drawing_test_screen.dart';
-import 'package:moca/views/test/memory_test_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:math';
 
 import '../../controllers/connecting_dots_controller.dart';
+import 'cube_drawing_test_screen.dart';
 
 class ConnectingDotsScreen extends StatefulWidget {
   const ConnectingDotsScreen({super.key});
@@ -16,10 +14,22 @@ class ConnectingDotsScreen extends StatefulWidget {
 }
 
 class _DotScreenState extends State<ConnectingDotsScreen> {
-  final ConnectingDotsController _controller =
-      Get.put(ConnectingDotsController());
+  final ConnectingDotsController _controller = Get.put(ConnectingDotsController());
   List<int> selectedIndices = [];
   late SharedPreferences sf;
+  @override
+  void initState() {
+    super.initState();
+    initalizeSharedPref();
+    Future.delayed(const Duration(seconds: 2), () {
+      _countdownTimer();
+    });
+  }
+
+  Future<void> initalizeSharedPref() async {
+    sf = await SharedPreferences.getInstance();
+  }
+
   bool nextscreen = false;
   final List<dynamic> patternSequence = [
     1,
@@ -38,7 +48,20 @@ class _DotScreenState extends State<ConnectingDotsScreen> {
   bool randomizeDots = true;
   int score = 0;
 
-  List<Offset> dotPositions = [];
+  List<Offset> dotPositions = [
+    Offset(120.0, 350.0),
+    Offset(140.0, 160.0),
+    Offset(270.0, 280.0),
+    Offset(220.0, 350.0),
+    Offset(170.0, 60.0),
+    Offset(270.0, 160.0),
+    Offset(70.0, 40.0),
+    Offset(200.0, 250.0),
+    Offset(70.0, 260.0),
+    Offset(270.0, 60.0),
+
+  ];
+
   List<dynamic> selectedValues = [];
   bool isTimerStarted = false;
 
@@ -53,72 +76,25 @@ class _DotScreenState extends State<ConnectingDotsScreen> {
         if (selectedValues.contains(patternSequence[index])) {
         } else {
           selectedIndices.add(index);
-          selectedValues
-              .add(patternSequence[index]); // Store the selected dot value
-          // print(selectedValues);
-          // print(selectedValues.length);
+          selectedValues.add(patternSequence[index]); // Store the selected dot value
         }
       }
       if (selectedValues.length == patternSequence.length) {
         _validatePattern();
         nextText();
       }
-
-      // isPatternCorrect.add(());
     });
   }
 
-  @override
-  void initState() {
-    super.initState();
-    initalizeSharedPref();
-    Future.delayed(const Duration(seconds: 2), () {
-      _countdownTimer();
-    });
-  }
-
-  Future<void> initalizeSharedPref() async {
-    sf = await SharedPreferences.getInstance();
-  }
   void _validatePattern() {
     for (int i = 0; i < patternSequence.length; i++) {
       if (selectedValues[i] == patternSequence[i]) {
         score++;
-        // print("score: $score");
       } else {
         return;
       }
     }
-
     return;
-  }
-
-  Offset getRandomDotPosition(
-      Size containerSize, List<Offset> existingPositions) {
-    final random = Random();
-    const dotSize = 50.0;
-
-    const minX = dotSize;
-    const minY = dotSize;
-    final maxX = containerSize.width - dotSize;
-    final maxY = containerSize.height - dotSize;
-
-    Offset newPosition;
-    bool isOverlapping = false;
-
-    do {
-      final x = minX + random.nextDouble() * (maxX - minX);
-      final y = minY + random.nextDouble() * (maxY - minY);
-      newPosition = Offset(x, y);
-
-      isOverlapping = existingPositions.any((position) {
-        final distance = (position - newPosition).distance;
-        return distance <
-            dotSize * 2; // Check if dots are too close to each other
-      });
-    } while (isOverlapping);
-
-    return newPosition;
   }
 
   void _countdownTimer() async {
@@ -135,16 +111,16 @@ class _DotScreenState extends State<ConnectingDotsScreen> {
 
   Future<void> nextText() async {
     nextscreen = true;
-    sf.setInt('nextGame', 4);
-    if(score == 10){
+
+    if (score == 10) {
       await _controller.updatetestScore(1);
-    }
-    else{
+    } else {
       await _controller.updatetestScore(0);
     }
     Future.delayed(const Duration(seconds: 3));
     {
-      Get.offAll(() => const AnimalNameGuessScreen());
+      sf.setInt('nextGame', 2);
+      Get.offAll(() => const DrawingScreen());
     }
   }
 
@@ -161,82 +137,79 @@ class _DotScreenState extends State<ConnectingDotsScreen> {
           ),
         ),
       ),
-      body: Padding(
-        padding: const EdgeInsets.only(right: 16, left: 16),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'Connect the Dots',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const Text(
-              'Select Dots, going from a number to a letter in ascending order. First select a number then select a letter. Begin from 1 and then to A then to 2 and so on.',
-              style: TextStyle(
-                fontSize: 18,
-                color: Colors.deepPurple,
-              ),
-            ),
-            SizedBox(height: MediaQuery.sizeOf(context).height * 0.02),
-            const Divider(
-              thickness: 1,
-              color: Colors.deepPurple,
-              indent: 16,
-              endIndent: 16,
-            ),
-            SizedBox(height: MediaQuery.sizeOf(context).height * 0.01),
-            Obx(
-              () => Text(
-                "Remaining Time: ${_controller.remainingSeconds} sec",
-                style: const TextStyle(
-                  color: Colors.deepPurple,
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.only(right: 16, left: 16),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                'Connect the Dots',
+                style: TextStyle(
+                  fontSize: 18,
                   fontWeight: FontWeight.bold,
-                  fontSize: 16,
                 ),
               ),
-            ),
-            Container(
-              width: double.infinity,
-              height: 500,
-              color: Colors.grey[300],
-              child: LayoutBuilder(
-                builder: (context, constraints) {
-                  final containerSize =
-                      Size(constraints.maxWidth, constraints.maxHeight);
-
-                  dotPositions.clear();
-                  for (int i = 0; i < patternSequence.length; i++) {
-                    final newPosition =
-                        getRandomDotPosition(containerSize, dotPositions);
-                    dotPositions.add(newPosition);
-                  }
-
-                  return Stack(
-                    children: [
-                      for (var i = 0; i < patternSequence.length; i++)
-                        Positioned(
-                          left: dotPositions[i].dx - 25,
-                          top: dotPositions[i].dy - 25,
-                          child: GestureDetector(
-                            onTap: () {
-                              selectDot(i);
-                            },
-                            child: Dot(
-                              index: patternSequence[i],
-                              isSelected: selectedIndices.contains(i),
-                            ),
-                          ),
-                        ),
-                    ],
-                  );
-                },
+              const Text(
+                'Select Dots, going from a number to a letter in ascending order. First select a number then select a letter. Begin from 1 and then to A then to 2 and so on.',
+                style: TextStyle(
+                  fontSize: 18,
+                  color: Colors.deepPurple,
+                ),
               ),
-            ),
-          ],
+              SizedBox(height: MediaQuery.sizeOf(context).height * 0.02),
+              const Divider(
+                thickness: 1,
+                color: Colors.deepPurple,
+                indent: 16,
+                endIndent: 16,
+              ),
+              SizedBox(height: MediaQuery.sizeOf(context).height * 0.01),
+              Obx(
+                    () => Text(
+                  "Remaining Time: ${_controller.remainingSeconds} sec",
+                  style: const TextStyle(
+                    color: Colors.deepPurple,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                  ),
+                ),
+              ),
+              Container(
+                width: double.infinity,
+                height: MediaQuery.sizeOf(context).height * 0.65,
+                color: Colors.grey[300],
+                child: LayoutBuilder(
+                  builder: (context, constraints) {
+                    final containerSize =
+                    Size(constraints.maxWidth, constraints.maxHeight);
+
+                    return Stack(
+                      children: [
+                        for (var i = 0; i < patternSequence.length; i++)
+                          if (i < dotPositions.length) // Check if the index is valid
+                            Positioned(
+                              left: dotPositions[i].dx - 25,
+                              top: dotPositions[i].dy - 25,
+                              child: GestureDetector(
+                                onTap: () {
+                                  selectDot(i);
+                                },
+                                child: Dot(
+                                  index: patternSequence[i],
+                                  isSelected: selectedIndices.contains(i),
+                                ),
+                              ),
+                            ),
+                      ],
+                    );
+                  },
+                ),
+              ),
+              const SizedBox(height: 20.0),
+            ],
+          ),
         ),
       ),
     );

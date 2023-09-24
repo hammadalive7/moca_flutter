@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:moca/views/animal_name_screen.dart';
-import 'package:moca/views/test_main_screens.dart';
+import 'package:moca/views/home_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../controllers/cognitive_failure_controller.dart';
 
 class CognitiveFailure extends StatefulWidget {
-  CognitiveFailure({super.key});
+  const CognitiveFailure({super.key});
 
   @override
   State<CognitiveFailure> createState() => _CognitiveFailureState();
@@ -54,17 +53,17 @@ class _CognitiveFailureState extends State<CognitiveFailure> {
             Row(
               children: [
                 Text(
-                  '1 = Never',
+                  '0 = Never',
                   style: TextStyle(fontSize: screenWidth * 0.04),
                 ),
                 SizedBox(width: screenWidth * 0.02),
                 Text(
-                  '2 = Rarely',
+                  '1 = Rarely',
                   style: TextStyle(fontSize: screenWidth * 0.04),
                 ),
                 SizedBox(width: screenWidth * 0.02),
                 Text(
-                  '3 = Sometimes',
+                  '2 = Sometimes',
                   style: TextStyle(fontSize: screenWidth * 0.04),
                 ),
                 SizedBox(width: screenWidth * 0.02),
@@ -73,12 +72,12 @@ class _CognitiveFailureState extends State<CognitiveFailure> {
             Row(
               children: [
                 Text(
-                  '4 = Often',
+                  '3 = Often',
                   style: TextStyle(fontSize: screenWidth * 0.04),
                 ),
                 SizedBox(width: screenWidth * 0.02),
                 Text(
-                  '5 = Very Often',
+                  '4 = Very Often',
                   style: TextStyle(fontSize: screenWidth * 0.04),
                 ),
               ],
@@ -144,16 +143,38 @@ class _CognitiveFailureState extends State<CognitiveFailure> {
                             setState(() {
                               _isloading = true;
                             });
-                            await _cognitiveFailureController
-                                .submitSurvey()
-                                .then((value) {
-                              if (value) {
-                                setState(() {
-                                  _isloading = false;
-                                });
-                                Get.offAll(() => const MainTestScreen());
-                              }
-                            });
+                            try {
+                              await _cognitiveFailureController
+                                  .submitSurvey()
+                                  .then((value) {
+                                if (value) {
+                                  setState(() {
+                                    _isloading = false;
+                                  });
+                                  Get.offAll(() => const HomeScreen());
+                                }
+                              });
+                            } catch (e) {
+                              setState(() {
+                                _isloading = false;
+                              });
+                              Get.snackbar(
+                                'Attention!',
+                                'Some Error Occured!',
+                                titleText: const Text(
+                                  'Attention!',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 20,
+                                  ),
+                                ),
+                                snackPosition: SnackPosition.TOP,
+                                backgroundColor: Colors.red.shade500,
+                                colorText: Colors.white,
+                                snackStyle: SnackStyle.FLOATING,
+                              );
+                            }
                           },
                           child: _isloading == true
                               ? const Row(
